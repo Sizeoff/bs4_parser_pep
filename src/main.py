@@ -4,11 +4,10 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 import requests_cache
-from pathlib import Path
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
-from constants import MAIN_DOC_URL, EXPECTED_STATUS, PYTHON3_DOC_URL
+from constants import BASE_DIR, MAIN_DOC_URL, EXPECTED_STATUS, PYTHON3_DOC_URL
 from outputs import control_output
 from utils import get_response, find_tag
 
@@ -139,7 +138,6 @@ def download(session):
     archive_url = urljoin(PYTHON3_DOC_URL, pdf_a4_link)
     filename = archive_url.split('/')[-1]
 
-    BASE_DIR = Path(__file__).parent
     downloads_dir = BASE_DIR / 'downloads'
     downloads_dir.mkdir(exist_ok=True)
     archive_path = downloads_dir / filename
