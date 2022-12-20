@@ -1,8 +1,9 @@
+import logging
 import re
 from urllib.parse import urljoin
-import logging
-import requests_cache
+
 from bs4 import BeautifulSoup
+import requests_cache
 from pathlib import Path
 from tqdm import tqdm
 
@@ -52,7 +53,7 @@ def pep(session):
 
 
 def whats_new(session):
-    results = [('Ссылка на статью', 'Заголовок', 'Редактор, автор')]
+    results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
 
     whats_new_url = urljoin(PYTHON3_DOC_URL, 'whatsnew/')
 
@@ -62,7 +63,7 @@ def whats_new(session):
 
     soup = BeautifulSoup(response.text, features='lxml')
 
-    main_div = find_tag(soup,'section', attrs={'id': 'what-s-new-in-python'})
+    main_div = find_tag(soup, 'section', attrs={'id': 'what-s-new-in-python'})
 
     div_with_ul = main_div.find('div', attrs={'class': 'toctree-wrapper'})
 
@@ -105,39 +106,33 @@ def latest_versions(session):
     else:
         raise Exception('Не найден список c версиями Python')
 
-    # Инициализация списка для хранения результатов.
-
     pattern = r'Python (?P<version>\d\.\d+) \((?P<status>.*)\)'
-    # Цикл для перебора тегов <a>, полученных ранее.
+
     for a_tag in a_tags:
-        # Извлечение ссылки.
+
         link = a_tag['href']
-        # Поиск паттерна в ссылке.
+
         text_match = re.search(pattern, a_tag.text)
         if text_match is not None:
-            # Если строка соответствует паттерну,
-            # переменным присываивается содержимое групп, начиная с первой.
+
             version, status = text_match.groups()
         else:
-            # Если строка не соответствует паттерну,
-            # первой переменной присваивается весь текст, второй — пустая строка.
+
             version, status = a_tag.text, ''
-        # Добавление полученных переменных в список в виде кортежа.
+
         results.append(
             (link, version, status)
         )
 
-    # Печать результата.
     return results
 
 
 def download(session):
-    # Вместо константы DOWNLOADS_URL, используйте переменную downloads_url.
     downloads_url = urljoin(PYTHON3_DOC_URL, 'download.html')
     response = session.get(downloads_url)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'lxml')
-    main_tag = find_tag(soup,'div', {'role': 'main'})
+    main_tag = find_tag(soup, 'div', {'role': 'main'})
     table_tag = main_tag.find('table', {'class': 'docutils'})
     pdf_a4_tag = table_tag.find('a', {'href': re.compile(r'.+pdf-a4\.zip$')})
     pdf_a4_link = pdf_a4_tag['href']
@@ -153,9 +148,7 @@ def download(session):
     if response is None:
         return
 
-    # В бинарном режиме открывается файл на запись по указанному пути.
     with open(archive_path, 'wb') as file:
-        # Полученный ответ записывается в файл.
         file.write(response.content)
 
     logging.info(f'Архив был загружен и сохранён: {archive_path}')
@@ -172,28 +165,23 @@ MODE_TO_FUNCTION = {
 def main():
     configure_logging()
     logging.info('Парсер запущен!')
-    # Конфигурация парсера аргументов командной строки —
-    # передача в функцию допустимых вариантов выбора.
+
     arg_parser = configure_argument_parser(MODE_TO_FUNCTION.keys())
-    # Считывание аргументов из командной строки.
+
     args = arg_parser.parse_args()
 
     logging.info(f'Аргументы командной строки: {args}')
-    # Поиск и вызов нужной функции по ключу словаря.
 
     session = requests_cache.CachedSession()
 
     if args.clear_cache:
-        # Очистка кеша.
         session.cache.clear()
 
     parser_mode = args.mode
-    # С вызовом функции передаётся и сессия.
+
     results = MODE_TO_FUNCTION[parser_mode](session)
 
-    # Если из функции вернулись какие-то результаты,
     if results is not None:
-        # передаём их в функцию вывода вместе с аргументами командной строки.
         control_output(results, args)
 
     logging.info('Парсер завершил работу.')

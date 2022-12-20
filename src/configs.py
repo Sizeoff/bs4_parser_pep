@@ -28,6 +28,7 @@ def configure_argument_parser(available_modes):
     )
     return parser
 
+
 def configure_logging():
     log_dir = BASE_DIR / 'logs'
     log_dir.mkdir(exist_ok=True)
