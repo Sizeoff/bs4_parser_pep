@@ -8,7 +8,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
-from constants import BASE_DIR, MAIN_DOC_URL, EXPECTED_STATUS, PYTHON3_DOC_URL
+from constants import MAIN_DOC_URL, EXPECTED_STATUS, PYTHON3_DOC_URL
 from outputs import control_output
 from utils import get_response, find_tag
 
