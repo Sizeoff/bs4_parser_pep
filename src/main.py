@@ -42,7 +42,7 @@ def pep(session):
                 statuses_common[1] != statuses_private):
             logging.error(f'''Несовпадающие статусы:
                                 {pep_private_url}
-                                Статус в карточке: {statuses_private} 
+                                Статус в карточке: {statuses_private}
                                 Статус в списке: {statuses_common[1]}''')
 
         EXPECTED_STATUS[statuses_private[0]] += 1
