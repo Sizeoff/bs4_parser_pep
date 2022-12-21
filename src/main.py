@@ -44,8 +44,10 @@ def pep(session):
                                 Статус в карточке: {statuses_private}
                                 Статус в списке: {statuses_common[1]}''')
 
-        EXPECTED_STATUS[statuses_private[0]] += 1
-
+        if statuses_private[0] in EXPECTED_STATUS.keys():
+            EXPECTED_STATUS[statuses_private[0]] += 1
+        else:
+            logging.error(f'Незапланированный статус: "{statuses_private[0]}"')
     results.extend(list(EXPECTED_STATUS.items()))
 
     return results
